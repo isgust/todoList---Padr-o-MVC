@@ -1,39 +1,69 @@
-#Model
-
+# Modelo (Model)
 class Task:
-  def __init__(self, titulo, description, dateOpen, dateClose):
-    self.titulo = titulo
-    self.descricao = description
-    self.dateOpen = dateOpen
-    self.dateClose = dateClose
+    def __init__(self, titulo, descricao, concluida=False):
+        self.titulo = titulo
+        self.descricao = descricao
+        self.concluida = concluida
 
-#View
-class Taskview:
-  def show_tasks(self, tasks):
-    print("Tarefas:")
-    for task in tasks:
-      print(f"Título: {task.titulo}, Descrição: {task.descricao}, Aberto em: {task.dateOpen}, Fechado em: {task.dateClose}")
-
-
-#Controller
+# Controlador (Controller)
 class TaskController:
-    def __init__(self, model, view):
-        self.model = model
-        self.view = view
+    def __init__(self):
+        self.tasks = []
 
-    def add_task(self, titulo, descricao, dateOpen, dateClose):
-        task = Task(titulo, descricao, dateOpen, dateClose)
-        self.model.add_task(task)
-        self.update_view()
+    def adicionar_tarefa(self, titulo, descricao):
+        task = Task(titulo, descricao)
+        self.tasks.append(task)
 
-    def mark_task_as_completed(self, task_index):
-        self.model.mark_task_as_completed(task_index)
-        self.update_view()
+    def marcar_tarefa_como_concluida(self, indice_tarefa):
+        if 0 <= indice_tarefa < len(self.tasks):
+            self.tasks[indice_tarefa].concluida = True
 
-    def get_task_list(self):
-        return self.model.get_task_list()
+    def obter_lista_de_tarefas(self):
+        return self.tasks
 
-    def update_view(self):
-        tasks = self.get_task_list()
-        self.view.show_tasks(tasks)
-      
+# Visão (View)
+class TaskView:
+    def mostrar_tarefas(self, tasks):
+        print("Lista de Tarefas:")
+        for index, task in enumerate(tasks):
+            status = "Concluída" if task.concluida else "Pendente"
+            print(f"{index + 1}. {task.titulo} - {status}")
+
+    def solicitar_titulo_descricao(self):
+        titulo = input("Digite o título da nova tarefa: ")
+        descricao = input("Digite a descrição da nova tarefa: ")
+        return titulo, descricao
+
+    def mostrar_mensagem(self, mensagem):
+        print(mensagem)
+
+# Uso do MVC
+if __name__ == "__main__":
+    controller = TaskController()
+    view = TaskView()
+
+    while True:
+        print("\n--- Menu ---")
+        print("1. Adicionar Tarefa")
+        print("2. Marcar Tarefa como Concluída")
+        print("3. Exibir Lista de Tarefas")
+        print("4. Sair")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            titulo, descricao = view.solicitar_titulo_descricao()
+            controller.adicionar_tarefa(titulo, descricao)
+            view.mostrar_mensagem("Tarefa adicionada com sucesso!")
+        elif opcao == "2":
+            indice_tarefa = int(input("Digite o número da tarefa a ser marcada como concluída: ")) - 1
+            controller.marcar_tarefa_como_concluida(indice_tarefa)
+            view.mostrar_mensagem("Tarefa marcada como concluída com sucesso!")
+        elif opcao == "3":
+            tasks = controller.obter_lista_de_tarefas()
+            view.mostrar_tarefas(tasks)
+        elif opcao == "4":
+            print("Saindo...")
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
