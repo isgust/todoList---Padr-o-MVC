@@ -1,9 +1,14 @@
+from datetime import date
+
 # Modelo (Model)
 class Task:
-    def __init__(self, titulo, descricao, concluida=False):
+    def __init__(self, titulo, descricao, dateOpen, dateClose=None, concluida=False):
         self.titulo = titulo
         self.descricao = descricao
+        self.dateOpen = dateOpen
+        self.dateClose = dateClose
         self.concluida = concluida
+
 
 # Controlador (Controller)
 class TaskController:
@@ -11,12 +16,13 @@ class TaskController:
         self.tasks = []
 
     def adicionar_tarefa(self, titulo, descricao):
-        task = Task(titulo, descricao)
+        task = Task(titulo, descricao, date.today())
         self.tasks.append(task)
 
     def marcar_tarefa_como_concluida(self, indice_tarefa):
         if 0 <= indice_tarefa < len(self.tasks):
             self.tasks[indice_tarefa].concluida = True
+            self.tasks[indice_tarefa].dateClose = date.today()
 
     def obter_lista_de_tarefas(self):
         return self.tasks
@@ -27,7 +33,9 @@ class TaskView:
         print("Lista de Tarefas:")
         for index, task in enumerate(tasks):
             status = "Concluída" if task.concluida else "Pendente"
-            print(f"{index + 1}. {task.titulo} - {status}")
+            dateOpen = task.dateOpen.strftime("%d/%m/%Y")  # Formata a data
+            dateClose = task.dateClose.strftime("%d/%m/%Y") if task.dateClose else "N/A"
+            print(f"{index + 1}. {task.titulo} - {status} - Início: {dateOpen} - Conclusão: {dateClose}")
 
     def solicitar_titulo_descricao(self):
         titulo = input("Digite o título da nova tarefa: ")
